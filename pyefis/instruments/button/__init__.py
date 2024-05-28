@@ -56,6 +56,7 @@ class Button(QWidget):
         self._buttonhide = self.config.get("hover_show", False)
         self._title = ""
         self._toggle = False
+        self.encoder_capture = False
         # Repalce {id} in the dbkey so we can have different 
         # button names per node without having 
         # to duplicate all buttons.
@@ -368,4 +369,30 @@ class Button(QWidget):
             self.processConditions(clicked=True)
         # Will trigger as if the button was selected
         # Will return control back to the caller
-        return False 
+        if self.encoder_capture:
+            return True
+        else:
+            return False 
+
+    def enc_clicked(self):
+        return self.enc_select()
+
+    def enc_changed(self,value):
+        return False
+
+# While this change works it is not very useful for baro, the only use case I have at the moment.
+Seems like it would work better if we could select it, then turn the encoder to manipulate the value.
+We would need to add some new condition check and feature like:
+when: ENCODER_DIAL
+action:
+  encoder_multiply: DBKEYHERE,0.01
+
+or in options as :
+options:
+  encoder_capture: true
+  encoder_multiplier: 0.01
+  encoder_key: DBKEY_TO_MODIFY
+
+If done like thi then the click would only capture it, would not change anything.
+And it should work like others where if you do not click to confirm the value is reverted.
+

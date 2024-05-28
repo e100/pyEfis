@@ -178,6 +178,7 @@ instruments:
     options:
       config: buttons/baro-down-invisible.yaml
       encoder_order: 200080
+      encoder_capture: true
   - type: button
     disabled: BARO_CONTROLS
     row: 83
@@ -188,6 +189,7 @@ instruments:
     options:
       config: buttons/baro-up-invisible.yaml
       encoder_order: 200090
+      encoder_capture: true
   - type: static_text
     disabled: PRESSURE_DISPLAY
     row: 95
