@@ -92,7 +92,6 @@ class Main(QMainWindow):
         # Init the variable to prvent exception in getRunningScreen()
         self.running_screen = None
         for idx, scr in enumerate(screens):
-
             scr.object = scr.module.Screen(self)
             setattr(scr.object,'screenName',scr.name)
             log.debug("Loading Screen {0}".format(scr.name))
@@ -100,16 +99,19 @@ class Main(QMainWindow):
             scr.object.resize(self.width(), self.height())
             scr.object.move(0,0)
             if scr.default:
+                print(f"show default")
                 scr.show()
                 self.running_screen = idx
             else:
-                scr.hide()
+                #scr.show()
+                print(f"show {idx}")
                 # This is to force screen builder to parse its configs now
                 # instead of waiting to do so just before it is first shown.
                 # Without this the user will often see a delay when navigating 
                 # to a screen for the first time
                 if callable(getattr(scr.object, 'initScreen', None)):
                     scr.object.initScreen()
+                scr.hide()
 
 
     def showScreen(self, scr):
@@ -143,9 +145,11 @@ class Main(QMainWindow):
             self.showScreen(self.running_screen-1)
 
     def getRunningScreen(self, s=""):
-        if getattr(self.running_screen, 'name', None):
+        if self.running_screen and getattr(screens[self.running_screen], 'name', None):
+            print(f"known: {screens[self.running_screen].name}")
             return screens[self.running_screen].name
         else:
+            print(f"Unknown {self.running_screen}: ")
             return 'Unknown'
 
     def doExit(self, s=""):

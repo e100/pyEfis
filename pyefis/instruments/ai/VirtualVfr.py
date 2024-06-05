@@ -57,7 +57,7 @@ class VirtualVfr(AI):
     def __init__(self, parent=None, font_percent=None, font_family="DejaVu Sans Condensed"):
         super(VirtualVfr, self).__init__(parent, font_percent=font_percent)
         self.display_objects = dict()
-        time.sleep(.6)      # Pause to let DB load
+        #time.sleep(.6)      # Pause to let DB load
         self.font_family = font_family
         self.gsi = False
         self.font_percent = font_percent
@@ -119,13 +119,6 @@ class VirtualVfr(AI):
         self.min_font_width = t.boundingRect().width()
         self.pov = None
 
-    def resizeEvent(self, event):
-        super(VirtualVfr, self).resizeEvent(event)
-        VirtualVfr.CENTERLINE_WIDTH = int(self.width() * 0.005)
-        VirtualVfr.MIN_FONT_SIZE=int(self.height() * 0.023)
-        VirtualVfr.AIRPORT_FONT_SIZE=int(self.height() * 0.03)
-        VirtualVfr.PAPI_YOFFSET = int(self.width() * 0.03)
-        VirtualVfr.PAPI_LIGHT_SPACING = int(self.width() * 0.02)
 
         dbpath = os.path.expanduser(self.myparent.get_config_item('dbpath'))
         indexpath = os.path.expanduser(self.myparent.get_config_item('indexpath'))
@@ -165,6 +158,17 @@ class VirtualVfr(AI):
         self.pov = PointOfView(dbpath,
                                indexpath,
                                self.myparent.get_config_item('refresh_period'))
+
+        self.pov.update_cache()
+
+    def resizeEvent(self, event):
+        super(VirtualVfr, self).resizeEvent(event)
+        VirtualVfr.CENTERLINE_WIDTH = int(self.width() * 0.005)
+        VirtualVfr.MIN_FONT_SIZE=int(self.height() * 0.023)
+        VirtualVfr.AIRPORT_FONT_SIZE=int(self.height() * 0.03)
+        VirtualVfr.PAPI_YOFFSET = int(self.width() * 0.03)
+        VirtualVfr.PAPI_LIGHT_SPACING = int(self.width() * 0.02)
+
         self.pov.initialize(["Runway", "Airport"], self.scene.width(),
                     self.lng, self.lat, self.altitude, self.true_heading)
 
