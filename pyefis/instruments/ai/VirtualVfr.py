@@ -57,7 +57,6 @@ class VirtualVfr(AI):
     def __init__(self, parent=None, font_percent=None, font_family="DejaVu Sans Condensed"):
         super(VirtualVfr, self).__init__(parent, font_percent=font_percent)
         self.display_objects = dict()
-        #time.sleep(.6)      # Pause to let DB load
         self.font_family = font_family
         self.gsi = False
         self.font_percent = font_percent

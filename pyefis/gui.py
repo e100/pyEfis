@@ -146,10 +146,8 @@ class Main(QMainWindow):
 
     def getRunningScreen(self, s=""):
         if self.running_screen and getattr(screens[self.running_screen], 'name', None):
-            print(f"known: {screens[self.running_screen].name}")
             return screens[self.running_screen].name
         else:
-            print(f"Unknown {self.running_screen}: ")
             return 'Unknown'
 
     def doExit(self, s=""):

@@ -12,7 +12,7 @@ do
     if (( pid == 0 )); then
       echo "starting waydroid"
       # Wait a couple seconds to ensure weston is ready
-      sleep 2
+      sleep 1
       export WAYLAND_DISPLAY=snap.pyefis/pyefis-waydroid-1
       waydroid show-full-ui &
       pid=$!
