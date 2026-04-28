@@ -1,6 +1,6 @@
 name: pyefis
 adopt-info: pyefis
-grade: stable
+grade: devel
 license: GPL-2.0+
 summary: pyEFIS Open Source Avionics Application
 description: |
@@ -23,7 +23,7 @@ description: |
   * Programable touchscreen buttons
   * Listbox widget
   * Control pyEFIS with a single rotary encoder and button
-  * Moved to core24 and python 3.12
+  * Moved to core26 and python 3.13
   * snap now includes the FAA CIFP data for Virtual VFR
   * yaml includes, easily include contents of one yaml file in another
   * Automatically sets screen resolution to match your screen, or you can still set it manually in the config file.
@@ -38,7 +38,8 @@ donation: https://www.paypal.com/donate/?hosted_button_id=VGHHNUG3LRPYL
 source-code: https://github.com/makerplane/pyEfis
 website: https://makerplane.org/
 
-base: core24
+base: core26
+build-base: devel
 confinement: strict
 compression: lzo 
 platforms:
@@ -53,6 +54,8 @@ layout:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libweston-9
   /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libweston-13:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libweston-13
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libweston-14:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libweston-14
   /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/weston:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/weston
   /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/weston-desktop-shell:
@@ -64,13 +67,13 @@ layout:
   /usr/libexec:
     bind: $SNAP/usr/libexec
   /usr/share/libdrm:
-    bind: $SNAP/gpu-2404/libdrm
+    bind: $SNAP/gpu-2604/libdrm
   /usr/share/drirc.d:
-    symlink: $SNAP/gpu-2404/drirc.d
+    symlink: $SNAP/gpu-2604/drirc.d
   /usr/share/X11/XErrorDB:
-    symlink: $SNAP/gpu-2404/X11/XErrorDB
+    symlink: $SNAP/gpu-2604/X11/XErrorDB
   /usr/share/X11/locale:
-    symlink: $SNAP/gpu-2404/X11/locale
+    symlink: $SNAP/gpu-2604/X11/locale
   /etc/fonts:
     bind: $SNAP/etc/fonts
   /usr/share/fonts:
@@ -101,9 +104,6 @@ parts:
       - libqt6svg6
       - libqt6waylandclient6
       - libqt6waylandcompositor6
-      - python3.12-minimal
-      - libpython3.12-minimal
-      - libpython3.12-stdlib
       - python3-venv
       - python3-minimal
       - python3-pkg-resources
@@ -123,7 +123,7 @@ parts:
     build-packages:
       - execstack
     build-environment:
-      - PARTS_PYTHON_INTERPRETER: python3.12
+      - PARTS_PYTHON_INTERPRETER: python3
 #      - PIP_VERBOSE: 3
       - PIP_IGNORE_INSTALLED: ''
       - PARTS_PYTHON_VENV_ARGS: --system-site-packages
@@ -135,21 +135,24 @@ parts:
           execstack -c $f
         fi
       done
-  gpu-2404:
+  gpu-2604:
     after: [pyefis]
     source: https://github.com/canonical/gpu-snap.git
     plugin: dump
     override-prime: |
       craftctl default
-      ${CRAFT_PART_SRC}/bin/gpu-2404-cleanup mesa-2404 nvidia-core24
+      ${CRAFT_PART_SRC}/bin/gpu-2604-cleanup mesa-2604
     prime:
-    - bin/gpu-2404-wrapper
+    - bin/gpu-2604-wrapper
 
 plugs:
-  gpu-2404:
+  gpu-2604:
     interface: content
-    target: $SNAP/gpu-2404
-    default-provider: mesa-2404
+    target: $SNAP/gpu-2604
+    # mesa-2604 is edge-only while core26 is pre-stable, and Snapcraft tries to
+    # install default providers from latest/stable during pack.
+    # Add this back once mesa-2604 is released to stable.
+    # default-provider: mesa-2604
 
   faa-cifp-data:
     interface : content
@@ -159,7 +162,7 @@ plugs:
 apps:
   daemon:
     command-chain:
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: bin/pyefis
     daemon: simple
     daemon-scope: user 
@@ -179,13 +182,14 @@ apps:
 
     environment:
       PATH: $SNAP/bin:$SNAP/usr/bin:$SNAP/usr/local/bin:$PATH
-      PYTHONPATH: $SNAP/lib/python3.12/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
+      PYTHONPATH: $SNAP/lib/python3.13/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
+
       QT_QPA_PLATFORM: xcb
       QT_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/qt6/plugins/ 
 
   server:
     command-chain:
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: bin/pyefis
     plugs:
       - home
@@ -200,7 +204,7 @@ apps:
 
     environment:
       PATH: $SNAP/bin:$SNAP/usr/bin:$SNAP/usr/local/bin:$PATH
-      PYTHONPATH: $SNAP/lib/python3.12/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
+      PYTHONPATH: $SNAP/lib/python3.13/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
       QT_QPA_PLATFORM: xcb
       QT_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/qt6/plugins/
 
@@ -209,5 +213,4 @@ apps:
     plugs: [ home, network, desktop-legacy, desktop, wayland, x11, opengl]
     environment:
       PATH: $SNAP/bin:$SNAP/usr/bin:$SNAP/usr/local/bin:$PATH
-      PYTHONPATH: $SNAP/lib/python3.12/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
-
+      PYTHONPATH: $SNAP/lib/python3.13/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
